@@ -7,8 +7,10 @@ brew "lazygit"
 brew "mise"
 brew "tmux"
 brew "smug"
+brew "herdr"     # ターミナルで動くエージェント用マルチプレクサ
 brew "fzf"       # あいまい検索（Ctrl-R で履歴検索）
 brew "fd"
+brew "eza"
 brew "bat"       # シンタックスハイライト付きcat
 brew "jq"        # JSON処理
 brew "tree"
