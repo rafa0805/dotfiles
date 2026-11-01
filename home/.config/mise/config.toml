@@ -1,0 +1,12 @@
+# mise のグローバル設定（どのディレクトリでも使う既定のバージョン）
+# プロジェクトごとのバージョンは、そのプロジェクトの mise.toml に書く:
+#   cd my-project && mise use node@22
+#
+# ここを変えたら `mise install` で入れる
+
+[tools]
+node = "lts"
+pnpm = "latest"
+"npm:@helpfeel/cosense-cli" = "latest"
+python = "latest"
+

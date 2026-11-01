@@ -1,0 +1,32 @@
+[alias]
+	st = status
+	df = diff
+	co = commit
+	br = branch
+	ps = push
+	pl = pull
+	ck = checkout
+[user]
+	name = Rafael Kosaka
+	email = rafael.y.kosaka@gmail.com
+[core]
+	editor = vi
+	pager = delta
+[delta]
+	navigate = true
+	dark = true
+[init]
+	defaultBranch = main
+[pull]
+	ff = only
+[rebase]
+	autostash = true
+
+# [IMPORTANT] this configuration should be placed in the last in order to overiride base config.
+[include]
+	path = ~/.gitconfig.local
+[interactive]
+	diffFilter = delta --color-only
+[merge]
+	conflictStyle = zdiff3
+

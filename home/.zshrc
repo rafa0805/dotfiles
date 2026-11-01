@@ -1,0 +1,73 @@
+# 対話シェルで読まれる設定。プラグインマネージャなしの素の zsh。
+# ツールが無い環境でもエラーにならないよう、外部コマンドは存在チェックしてから使う。
+
+# ---------------------------------------------------------------- 履歴
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=100000
+SAVEHIST=100000
+setopt share_history        # 複数ターミナルで履歴を共有
+setopt hist_ignore_all_dups # 重複を残さない
+setopt hist_ignore_space    # 先頭スペースのコマンドは残さない
+setopt hist_reduce_blanks
+
+# ---------------------------------------------------------------- 基本
+setopt auto_cd              # ディレクトリ名だけで cd
+setopt auto_pushd pushd_ignore_dups
+setopt interactive_comments
+setopt no_beep
+bindkey -e                  # emacs キーバインド
+bindkey \^U backward-kill-line # Ctrl+Uはカーソル以降を削除 (bash like)
+
+# ---------------------------------------------------------------- 補完
+if command -v brew >/dev/null 2>&1; then
+  fpath=("$(brew --prefix)/share/zsh/site-functions" $fpath)
+fi
+autoload -Uz compinit && compinit -d "$HOME/.zcompdump"
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'  # 大文字小文字を区別しない
+zstyle ':completion:*' menu select
+
+# ---------------------------------------------------------------- プロンプト
+# 例: ~/dotfiles (main) %
+autoload -Uz vcs_info
+zstyle ':vcs_info:git:*' formats ' (%b)'
+precmd() { vcs_info }
+setopt prompt_subst
+PROMPT='%F{cyan}%~%f%F{yellow}${vcs_info_msg_0_}%f %(?.%#.%F{red}%#%f) '
+
+# ---------------------------------------------------------------- エイリアス
+case "$OSTYPE" in
+  darwin*) alias ls='ls -G' ;;
+  *)       alias ls='ls --color=auto' ;;
+esac
+alias ll='ls -lhA'
+alias ..='cd ..'
+alias g='git'
+alias lg='lazygit'
+
+command -v bat >/dev/null 2>&1 && alias cat='bat --paging=never --style=plain'
+
+# ---------------------------------------------------------------- 関数
+# diffを綺麗に表示
+pdiff() {
+    diff -u "$1" "$2" | delta
+}
+
+# ---------------------------------------------------------------- mise
+if command -v mise >/dev/null 2>&1; then
+  eval "$(mise activate zsh)"
+fi
+
+# ---------------------------------------------------------------- fzf
+# Ctrl-R: 履歴検索 / Ctrl-T: ファイル検索
+if command -v fzf >/dev/null 2>&1; then
+  # see: https://github.com/junegunn/fzf#setting-up-shell-integration
+  source <(fzf --zsh) 2>/dev/null
+fi
+
+# ---------------------------------------------------------------- WSL
+if command -v wslview >/dev/null 2>&1; then
+  export BROWSER=wslview
+fi
+
+# ---------------------------------------------------------------- マシン固有
+[[ -r "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
