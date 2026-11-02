@@ -19,7 +19,7 @@ OS は `uname -s` と `/etc/os-release` の `ID` で判定する（`ID=ubuntu` �
 - Ubuntu では `sudo` が使える（apt でパッケージを入れるため）
 - macOS では Xcode Command Line Tools を入れられる（未導入ならインストールダイアログが出る）
 - `bootstrap.sh` を使う場合、リポジトリが公開されている（非公開だと clone できない）
-- アイコン表示（eza・lazygit・starship など）には Nerd Font 対応のフォントを端末に設定しておく
+- アイコン表示（eza・lazygit など）には Nerd Font 対応のフォントを端末に設定しておく（starship の設定はアイコンを使わないので不要）
 
 ## セットアップ
 
@@ -242,7 +242,7 @@ Ubuntu 以外の Linux などではフルセットアップできない。設定
 `chsh` に失敗した場合は警告が出るので、手動で実行する。
 
 ```sh
-chsh -s "$(command -v zsh)"   # OS 標準の zsh（/bin/zsh や /usr/bin/zsh）を指定する
+chsh -s /bin/zsh   # OS 標準の zsh を指定する（Ubuntu では /usr/bin/zsh）
 ```
 
 brew の zsh ではなく OS 標準の zsh を使うのは、brew が壊れたときにログインできなくなるのを避けるため。
