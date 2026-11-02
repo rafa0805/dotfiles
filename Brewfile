@@ -13,6 +13,7 @@ brew "lazygit"   # gitのTUIクライアント
 brew "mise"      # 言語ランタイムのバージョン管理
 brew "ripgrep"   # rg: 速い grep
 brew "smug"      # tmuxセッションをYAMLで定義・起動
+brew "starship"  # 軽量でカスタマイズしやすいシェルプロンプト
 brew "tmux"      # ターミナルマルチプレクサ
 brew "tree"      # ディレクトリ構造をツリー表示
 brew "zoxide"    # z: よく使うディレクトリへ素早く移動

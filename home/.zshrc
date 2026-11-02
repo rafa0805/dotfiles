@@ -27,12 +27,18 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'  # 大文字小文字を区�
 zstyle ':completion:*' menu select
 
 # ---------------------------------------------------------------- プロンプト
+# starship があれば使う（設定は ~/.config/starship.toml）。
+# 無い環境では vcs_info による素のプロンプトにフォールバック。
 # 例: ~/dotfiles (main) %
-autoload -Uz vcs_info
-zstyle ':vcs_info:git:*' formats ' (%b)'
-precmd() { vcs_info }
-setopt prompt_subst
-PROMPT='%F{cyan}%~%f%F{yellow}${vcs_info_msg_0_}%f %(?.%#.%F{red}%#%f) '
+if command -v starship >/dev/null 2>&1; then
+  eval "$(starship init zsh)"
+else
+  autoload -Uz vcs_info
+  zstyle ':vcs_info:git:*' formats ' (%b)'
+  precmd() { vcs_info }
+  setopt prompt_subst
+  PROMPT='%F{cyan}%~%f%F{yellow}${vcs_info_msg_0_}%f %(?.%#.%F{red}%#%f) '
+fi
 
 # ---------------------------------------------------------------- エイリアス
 case "$OSTYPE" in

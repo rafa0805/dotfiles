@@ -1,0 +1,29 @@
+# starship のプロンプト設定。
+# 素の zsh プロンプト（cyan のディレクトリ + yellow の git ブランチ）に寄せたミニマル構成。
+# Nerd Font が無くても崩れないよう、アイコンは使わず ASCII 記号だけで組む。
+# 例: ~/dotfiles (main) %
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# 表示するモジュールと順番を明示（ここに無いモジュールは出さない）
+format = '$directory$git_branch$character'
+
+# プロンプト前に空行を入れない
+add_newline = false
+
+# ディレクトリ: cyan、~ 起点のフルパス表示
+[directory]
+style = 'cyan'
+format = '[$path]($style)[$read_only]($read_only_style)'
+truncation_length = 0     # パスを省略しない（%~ と同じ）
+truncate_to_repo = false  # リポジトリ直下からの表示に切り詰めない
+read_only = ' [ro]'       # 読み取り専用ディレクトリの印（アイコンの代わり）
+
+# git ブランチ: yellow で ' (main)' の形
+[git_branch]
+style = 'yellow'
+format = '[ \($branch\)]($style)'
+
+# 入力記号: 直前のコマンドが成功なら %、失敗なら赤い %
+[character]
+success_symbol = ' %'
+error_symbol = ' [%](red)'
