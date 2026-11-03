@@ -137,6 +137,12 @@ mise で入れるランタイム（`home/.config/mise/config.toml`）: node（LT
 | `g`             | `git`                                                        |
 | `lg`            | `lazygit`                                                    |
 | `pdiff a b`     | `diff -u a b` を delta で見やすく表示                        |
+| `z foo`         | zoxide: `foo` を含むよく使うディレクトリへ移動               |
+| `zi`            | zoxide: 候補を fzf で対話的に選んで移動                      |
+
+`z` / `zi` は zoxide がある場合のみ定義される。zoxide は移動したディレクトリを頻度と最近度で記録し、
+`z foo bar` のように複数キーワードで絞り込める。`cd` 自体を置き換えたい場合は
+`.zshrc` の初期化を `zoxide init zsh --cmd cd` に変える（`cd` / `cdi` になる）。
 
 fzf のキー（`fzf --zsh` のシェル統合）:
 
