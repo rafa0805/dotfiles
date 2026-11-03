@@ -177,6 +177,12 @@ starship が無い環境では従来の素の zsh プロンプトにフォール
 ### lazygit（`home/.config/lazygit/config.yml`）
 
 - アイコン表示を有効化（`gui.showIcons: true`。Nerd Font が必要）
+- 差分の表示に delta を使う（`git.diffRenderers`）。`|` キーで次の表示に切り替えられる
+  - delta（行番号付き。デフォルト）
+  - delta の左右分割表示（`--side-by-side`）。ペインが狭いと読みにくいので必要なときだけ使う
+  - git 標準の差分表示
+- 端末の背景色に合わせて `--dark` / `--light` を自動で切り替える（`--{{colorScheme}}`）
+- `--paging=never` で delta から less を起動させない（`~/.gitconfig` の `delta.navigate` は less 前提のため lazygit では効かない）
 
 ## 更新方法
 
