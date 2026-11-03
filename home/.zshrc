@@ -53,9 +53,17 @@ alias lg='lazygit'
 command -v bat >/dev/null 2>&1 && alias cat='bat --paging=never --style=plain'
 
 # ---------------------------------------------------------------- 関数
-# diffを綺麗に表示
+# diffを綺麗に表示（delta が無ければ diff -u のまま表示）
 pdiff() {
-    diff -u "$1" "$2" | delta
+  if (( $# != 2 )); then
+    print -u2 "usage: pdiff <file1> <file2>"
+    return 2
+  fi
+  if command -v delta >/dev/null 2>&1; then
+    diff -u -- "$1" "$2" | delta
+  else
+    diff -u -- "$1" "$2"
+  fi
 }
 
 # ---------------------------------------------------------------- mise
