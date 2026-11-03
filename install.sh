@@ -47,6 +47,29 @@ link_files() {
     ln -s "$src" "$dest"
     info "link ~/$rel"
   done < <(find "$DOTFILES_DIR/home" -type f -print0)
+  prune_dangling_links
+}
+
+# home/ から消した・名前を変えたファイルの、~ に残ったリンク切れを消す。
+# 対象は「リンク切れ」かつ「リンク先が $DOTFILES_DIR/home/ 配下」のシンボリックリンクだけ。
+# ~ 全体を深く走査すると遅い（node_modules や WSL の /mnt など）ので、
+# ~ 直下と、home/ に今あるディレクトリに対応する ~ 側のディレクトリだけを
+# それぞれ深さ 1 で見る。home/ からディレクトリごと消した場合、その中のリンクは
+# 拾えない（手動で消す）が、マニフェストを持つより単純で壊れにくいのでこの方式にする。
+# GNU / BSD 両方で動くよう find -xtype や readlink -f は使わない。
+prune_dangling_links() {
+  local dir link target
+  while IFS= read -r -d '' dir; do
+    dir="$HOME${dir#"$DOTFILES_DIR/home"}"
+    [[ -d "$dir" && ! -L "$dir" ]] || continue
+    while IFS= read -r -d '' link; do
+      [[ -e "$link" ]] && continue
+      target="$(readlink "$link")" || continue
+      [[ "$target" == "$DOTFILES_DIR/home/"* ]] || continue
+      rm "$link"
+      info "リンク切れの ~${link#"$HOME"} を削除しました"
+    done < <(find "$dir" -mindepth 1 -maxdepth 1 -type l -print0)
+  done < <(find "$DOTFILES_DIR/home" -type d -print0)
 }
 
 # OS 標準の zsh を使う（brew の zsh だと brew が壊れたときにログインできなくなるため）

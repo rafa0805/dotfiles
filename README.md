@@ -63,6 +63,7 @@ curl -fsSL https://raw.githubusercontent.com/rafa0805/dotfiles/main/bootstrap.sh
 8. OS 固有の設定（`os_defaults`。現状は空）
 
 既存のファイルは上書きせず `~/.dotfiles_backup/<YYYYmmdd-HHMMSS>/` に退避する（既に正しいリンクなら何もしない）。
+`home/` から消した・名前を変えたファイルの古いリンク（リンク先が `home/` 配下でリンク切れのもの）は自動で削除する（`--link` でも同じ）。
 
 終わったら新しいターミナルを開く。
 
