@@ -21,12 +21,11 @@
 	ff = only
 [rebase]
 	autostash = true
-
-# [IMPORTANT] this configuration should be placed in the last in order to overiride base config.
-[include]
-	path = ~/.gitconfig.local
 [interactive]
 	diffFilter = delta --color-only
 [merge]
 	conflictStyle = zdiff3
 
+# [IMPORTANT] this configuration should be placed in the last in order to overiride base config.
+[include]
+	path = ~/.gitconfig.local
