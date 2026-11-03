@@ -201,14 +201,17 @@ mise で入れるランタイム（`home/.config/mise/config.toml`）: node（LT
 | 名前            | 内容                                                         |
 | --------------- | ------------------------------------------------------------ |
 | `cat`           | `bat --paging=never --style=plain`（bat がある場合のみ）     |
-| `ls`            | 色付き ls（macOS は `ls -G`、Linux は `ls --color=auto`）    |
-| `ll`            | `ls -lhA`                                                    |
+| `ls`            | `eza --icons=auto --group-directories-first`（eza が無ければ色付き ls） |
+| `ll`            | `eza -lha --git`（詳細・ドットファイル込み・git 状態。eza が無ければ `ls -lhA`） |
+| `lt`            | `eza --tree --level=2`（eza がある場合のみ）                 |
 | `..`            | `cd ..`                                                      |
 | `g`             | `git`                                                        |
 | `lg`            | `lazygit`                                                    |
 | `pdiff a b`     | `diff -u a b` を delta で見やすく表示                        |
 | `z foo`         | zoxide: `foo` を含むよく使うディレクトリへ移動               |
 | `zi`            | zoxide: 候補を fzf で対話的に選んで移動                      |
+
+`ls` は eza に置き換わるため `ls -t` など一部のフラグは意味が異なる。元の ls は `command ls` か `\ls` で呼べる。
 
 `z` / `zi` は zoxide がある場合のみ定義される。zoxide は移動したディレクトリを頻度と最近度で記録し、
 `z foo bar` のように複数キーワードで絞り込める。`cd` 自体を置き換えたい場合は

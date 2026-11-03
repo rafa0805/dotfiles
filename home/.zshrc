@@ -41,11 +41,19 @@ else
 fi
 
 # ---------------------------------------------------------------- エイリアス
-case "$OSTYPE" in
-  darwin*) alias ls='ls -G' ;;
-  *)       alias ls='ls --color=auto' ;;
-esac
-alias ll='ls -lhA'
+# eza があれば ls / ll / lt に使う（元の ls は `command ls` か `\ls` で呼べる）。
+# 無い環境では色付きの素の ls にフォールバック。
+if command -v eza >/dev/null 2>&1; then
+  alias ls='eza --icons=auto --group-directories-first'
+  alias ll='eza -lha --git --icons=auto --group-directories-first' # -a でドットファイルも表示（. と .. は出ない）
+  alias lt='eza --tree --level=2 --icons=auto --group-directories-first'
+else
+  case "$OSTYPE" in
+    darwin*) alias ls='ls -G' ;;
+    *)       alias ls='ls --color=auto' ;;
+  esac
+  alias ll='ls -lhA'
+fi
 alias ..='cd ..'
 alias g='git'
 alias lg='lazygit'
