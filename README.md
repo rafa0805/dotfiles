@@ -19,7 +19,7 @@ OS は `uname -s` と `/etc/os-release` の `ID` で判定する（`ID=ubuntu` �
 - Ubuntu では `sudo` が使える（apt でパッケージを入れるため）
 - macOS では Xcode Command Line Tools を入れられる（未導入ならインストールダイアログが出る）
 - `bootstrap.sh` を使う場合、リポジトリが公開されている（非公開だと clone できない）
-- アイコン表示（eza・lazygit など）には Nerd Font 対応のフォントを端末に設定しておく（starship の設定はアイコンを使わないので不要）
+- アイコン表示（starship・eza・lazygit など）には Nerd Font 対応のフォントを端末に設定しておく
 
 ## セットアップ
 
@@ -225,13 +225,14 @@ fzf のキー（`fzf --zsh` のシェル統合）:
 ### プロンプト
 
 starship があれば starship を使う（設定は `home/.config/starship.toml` → `~/.config/starship.toml`）。
-starship が無い環境では従来の素の zsh プロンプトにフォールバックする。
+設定は starship のデフォルトのまま（アイコン表示に Nerd Font が必要）。
 
 ```
-~/dotfiles (main) %
+dotfiles on  main [!?⇡] via  v22.11.0 took 3s
+❯
 ```
 
-カレントディレクトリ（シアン）、git ブランチ（黄）、`%`（直前のコマンドが失敗すると赤）を表示する。
+starship が無い環境では素の zsh プロンプト（`~/dotfiles (main) %`）にフォールバックする。
 
 ### git（`home/.gitconfig`）
 
