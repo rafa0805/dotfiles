@@ -66,6 +66,76 @@ curl -fsSL https://raw.githubusercontent.com/rafa0805/dotfiles/main/bootstrap.sh
 
 終わったら新しいターミナルを開く。
 
+## git の認証（GitHub）
+
+`bootstrap.sh` は HTTPS で clone するので、push するには認証の設定が必要。SSH を推奨する。
+
+`~/.gitconfig` は dotfiles の `home/.gitconfig` へのシンボリックリンクなので、`git config --global` や `gh auth setup-git` はリポジトリ管理下のファイルを書き換えてしまう。マシン固有の認証設定は `~/.gitconfig.local` に書く。
+
+### SSH（推奨）
+
+1. 鍵を作る（既にあれば不要）
+
+   ```sh
+   ssh-keygen -t ed25519 -C "you@example.com"
+   ```
+
+2. ssh-agent に鍵を登録する。`~/.ssh/config` は dotfiles では管理していないので各マシンで書く。
+
+   ```
+   Host github.com
+     AddKeysToAgent yes
+     UseKeychain yes              # macOS のみ（パスフレーズをキーチェーンに保存）
+     IdentityFile ~/.ssh/id_ed25519
+   ```
+
+   macOS では `ssh-add --apple-use-keychain ~/.ssh/id_ed25519` で一度キーチェーンに登録する。Linux では `UseKeychain` の行を消す（未知のオプションでエラーになる）。
+
+3. 公開鍵を GitHub に登録する。次のどれかで行う。
+   - `gh auth login` で git のプロトコルに SSH を選ぶ（既存の鍵をアップロードするか、無ければ作成を提案される）
+   - `gh ssh-key add ~/.ssh/id_ed25519.pub --title "<マシン名>"`（`admin:public_key` スコープが必要。足りなければ `gh auth refresh -h github.com -s admin:public_key`）
+   - GitHub の Settings → SSH and GPG keys に `~/.ssh/id_ed25519.pub` の中身を貼る
+
+4. 確認して、dotfiles の remote を SSH に切り替える
+
+   ```sh
+   ssh -T git@github.com    # "Hi <ユーザー名>! You've successfully authenticated" と出れば OK
+   cd ~/dotfiles
+   git remote set-url origin git@github.com:rafa0805/dotfiles.git
+   ```
+
+HTTPS の URL をすべて SSH に読み替えたい場合は `~/.gitconfig.local` に書く。
+
+```
+[url "git@github.com:"]
+	insteadOf = https://github.com/
+```
+
+### HTTPS
+
+`gh auth login` で git のプロトコルに HTTPS を選び、ブラウザで認証する。
+「Authenticate Git with your GitHub credentials?」に Yes と答えると、`gh auth setup-git` と同じく `~/.gitconfig`（= dotfiles の `home/.gitconfig`）に brew の絶対パス入りの credential helper が書き込まれる。
+OS ごとにパスが違う（`/opt/homebrew` / `/home/linuxbrew/.linuxbrew`）のでコミットしない。No と答えて、次を `~/.gitconfig.local` に書く。
+
+```
+[credential "https://github.com"]
+	helper =
+	helper = !gh auth git-credential
+[credential "https://gist.github.com"]
+	helper =
+	helper = !gh auth git-credential
+```
+
+空の `helper =` は、それまでに設定された helper（osxkeychain など）をリセットして gh だけを使うためのもの。
+既に `home/.gitconfig` に書き込まれてしまった場合は、そのブロックを `~/.gitconfig.local` に移す（`git -C ~/dotfiles diff` で確認できる）。
+
+確認:
+
+```sh
+gh auth status
+git config --show-origin --get-all credential.https://github.com.helper   # ~/.gitconfig.local から読まれていれば OK
+```
+
 ## 構成
 
 ```
