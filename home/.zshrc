@@ -75,5 +75,12 @@ if command -v wslview >/dev/null 2>&1; then
   export BROWSER=wslview
 fi
 
+# ---------------------------------------------------------------- zoxide
+# z <キーワード>: よく使うディレクトリへ移動 / zi: fzf で対話的に選んで移動
+# zoxide は compinit やプロンプトのフック設定より後（設定の最後）で初期化する。
+if command -v zoxide >/dev/null 2>&1; then
+  eval "$(zoxide init zsh)"
+fi
+
 # ---------------------------------------------------------------- マシン固有
 [[ -r "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
