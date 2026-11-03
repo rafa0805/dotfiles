@@ -1,2 +1,18 @@
 gui:
   showIcons: true
+
+git:
+  # 差分の表示に使うレンダラー。`|` キーで順に切り替えられる（先頭がデフォルト）
+  # https://github.com/jesseduffield/lazygit/blob/master/docs/Custom_DiffRenderers.md
+  diffRenderers:
+    # delta（行番号付き）。--{{colorScheme}} で端末の背景に合わせて --dark/--light を渡す。
+    # --paging=never は必須（~/.gitconfig の delta.navigate は less 前提で lazygit では使えない）
+    - command: delta --{{colorScheme}} --paging=never --line-numbers
+      colorArg: always
+    # delta の左右分割表示。ペインが狭いと読みにくいので、必要なときだけ切り替えて使う
+    - name: delta side-by-side
+      command: delta --{{colorScheme}} --paging=never --side-by-side --width={{width}}
+      colorArg: always
+    # git 標準の差分表示
+    - type: rawGit
+      name: default
