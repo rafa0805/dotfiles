@@ -137,6 +137,12 @@ gh auth status
 git config --show-origin --get-all credential.https://github.com.helper   # ~/.gitconfig.local から読まれていれば OK
 ```
 
+## Claude Code の設定
+
+`~/.claude/settings.json` は `home/.claude/settings.json` へのシンボリックリンクになる。リンクするのはこのファイルだけで、`~/.claude/` 配下のほかのファイル（`.credentials.json`、`projects/`、`history.jsonl` など）は対象外。既存の `settings.json` はほかのファイルと同じく `~/.dotfiles_backup/<日時>/` に退避される。
+
+`/config` での変更や、ユーザー単位で「常に許可」した権限、herdr の連携設定の再インストールなどは、Claude Code がこのファイルに直接書き込む。つまりリポジトリ管理下のファイルが書き換わるので、`git -C ~/dotfiles diff` で確認してからコミットする。トークンなどの機密情報や、マシン固有の絶対パスは書かない。
+
 ## 構成
 
 ```
@@ -150,6 +156,7 @@ git config --show-origin --get-all credential.https://github.com.helper   # ~/.g
 │   ├── .zprofile
 │   ├── .gitconfig
 │   ├── .tmux.conf
+│   ├── .claude/settings.json   # Claude Code のユーザー設定（このファイルだけリンク）
 │   └── .config/
 │       ├── lazygit/config.yml
 │       ├── mise/config.toml
