@@ -274,8 +274,8 @@ git 2.54 から使える config の hook（`~/.gitconfig` の `[hook "betterleak
 - リポジトリごとに止める: `git config hook.betterleaks.enabled false`
 
 git 2.54 より古い git はこの設定を**エラーも出さずに無視する**（スキャンされずにコミットできてしまう）。
-brew の git は新しいが、macOS の `/usr/bin/git` や apt の git は古いことがあり、GUI のツールがそちらを使うと素通りになる。
-`install.sh` は PATH の git と `/usr/bin/git` のバージョンを確認し、古ければ警告を出す。
+`install.sh` は PATH の git（brew の git）のバージョンを確認し、古ければ警告を出す。
+macOS の `/usr/bin/git` や apt の git は古いので、GUI のツールなどがそちらを使うとスキャンされない点に注意。
 
 ### tmux（`home/.tmux.conf`）
 
