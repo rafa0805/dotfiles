@@ -13,6 +13,8 @@ Homebrew で入れる CLI ツール一式をまとめてセットアップする
 
 OS は `uname -s` と `/etc/os-release` の `ID` で判定する（`ID=ubuntu` のみ Ubuntu 扱い）。
 
+Windows + WSL2 の場合、Windows 側（アプリ・キー配置・WSL と Ubuntu のインストール）は [windows/README.md](windows/README.md) の `windows/setup.ps1` でセットアップする。その後、Ubuntu の中で下の手順を行う。
+
 前提:
 
 - `bash` と `curl` が使える
@@ -165,6 +167,7 @@ git config --show-origin --get-all credential.https://github.com.helper   # ~/.g
 │       ├── mise/config.toml
 │       └── starship.toml
 ├── installers/         # OS 固有の処理（macos.sh / ubuntu.sh）
+├── windows/            # Windows ホストのセットアップ（setup.ps1。README.md も別にある）
 └── lib/                # 共通の関数（common, homebrew, git, mise, claude, tmux）
 ```
 
