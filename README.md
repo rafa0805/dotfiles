@@ -56,6 +56,7 @@ curl -fsSL https://raw.githubusercontent.com/rafa0805/dotfiles/main/bootstrap.sh
    - Ubuntu: apt で `build-essential` `procps` `curl` `file` `git` `zsh`
 2. Homebrew のインストール（未導入なら）と `brew bundle`（`Brewfile`）
 3. `home/` 以下を `~` にシンボリックリンク
+   - git が 2.54 より古ければ警告を出す（betterleaks のコミット前チェックが動かないため）
 4. `mise install` でランタイムを入れる（`~/.config/mise/config.toml`）
 5. Claude Code CLI のインストール（公式インストーラー。導入済みならスキップ）
 6. tmux プラグインマネージャ（tpm）の clone / 更新とプラグインのインストール
@@ -158,11 +159,12 @@ git config --show-origin --get-all credential.https://github.com.helper   # ~/.g
 │   ├── .tmux.conf
 │   ├── .claude/settings.json   # Claude Code のユーザー設定（このファイルだけリンク）
 │   └── .config/
+│       ├── git/hooks/pre-commit-betterleaks  # コミット前のシークレット検出
 │       ├── lazygit/config.yml
 │       ├── mise/config.toml
 │       └── starship.toml
 ├── installers/         # OS 固有の処理（macos.sh / ubuntu.sh）
-└── lib/                # 共通の関数（common, homebrew, mise, claude, tmux）
+└── lib/                # 共通の関数（common, homebrew, git, mise, claude, tmux）
 ```
 
 ## 主なツール
@@ -172,6 +174,7 @@ git config --show-origin --get-all credential.https://github.com.helper   # ~/.g
 | ツール    | 内容                                         |
 | --------- | -------------------------------------------- |
 | bat       | シンタックスハイライト付き cat               |
+| betterleaks | コミット前にシークレットを検出（gitleaks 後継） |
 | eza       | 見やすい ls（アイコン・git 状態表示）        |
 | fd        | 速くて使いやすい find                        |
 | fzf       | あいまい検索                                 |
@@ -252,6 +255,27 @@ starship が無い環境では素の zsh プロンプト（`~/dotfiles (main) %`
 - `pull.ff = only`（fast-forward できないときは失敗する）、`rebase.autostash = true`
 - `init.defaultBranch = main`、`merge.conflictStyle = zdiff3`、エディタは `vi`
 - `~/.gitconfig.local` を include する（マシンごとの user.email などはここに書く）
+- `[hook "betterleaks"]` でコミット前にシークレットを検出する（下記）
+
+#### コミット前のシークレット検出（`home/.config/git/hooks/pre-commit-betterleaks`）
+
+すべてのリポジトリで、コミット前にステージ済みの変更を [betterleaks](https://github.com/betterleaks/betterleaks) でスキャンし、
+API キーやトークンらしき文字列があればコミットを止める（検出結果は `--redact` で伏せ字にして表示する）。
+
+git 2.54 から使える config の hook（`~/.gitconfig` の `[hook "betterleaks"]`）で登録している。
+`core.hooksPath` と違って `.git/hooks` を置き換えないので、リポジトリ固有のフック（git-lfs や `pre-commit install` で入るものなど）もそのまま動く。
+リポジトリ側で `core.hooksPath` を設定している場合（husky など）も、betterleaks のスキャンは走る。
+登録されているフックは `git hook list --show-scope pre-commit` で確認できる。
+
+- betterleaks が入っていない環境では警告だけ出してコミットは通す
+- v1（brew の stable）は `betterleaks git --pre-commit --staged`、v2 は `git diff --cached | betterleaks stdin --git-diff` で実行する（自動で切り替え）
+- 誤検知: 行末に `betterleaks:allow` を含むコメントを付ける、または `.betterleaksignore` に書く。ルールの調整はリポジトリ直下の `.betterleaks.toml`（`.gitleaks.toml` も読む）
+- 一時的に飛ばす: `SKIP_BETTERLEAKS=1 git commit ...`（`git commit --no-verify` は `.git/hooks` のフックも含めてすべて飛ばす）
+- リポジトリごとに止める: `git config hook.betterleaks.enabled false`
+
+git 2.54 より古い git はこの設定を**エラーも出さずに無視する**（スキャンされずにコミットできてしまう）。
+brew の git は新しいが、macOS の `/usr/bin/git` や apt の git は古いことがあり、GUI のツールがそちらを使うと素通りになる。
+`install.sh` は PATH の git と `/usr/bin/git` のバージョンを確認し、古ければ警告を出す。
 
 ### tmux（`home/.tmux.conf`）
 

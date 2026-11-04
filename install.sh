@@ -111,6 +111,10 @@ main() {
   # 設定ファイルのシンボリックリンクを張る
   link_files
 
+  # git が古いと betterleaks のフック（config の hook）が動かないので確認する
+  source "$DOTFILES_DIR/lib/git.sh"
+  check_git_hook_support
+
   # mise でランタイムを入れる
   source "$DOTFILES_DIR/lib/mise.sh"
   mise_install
