@@ -1,3 +1,4 @@
 *.local
+!/home/.local/
 .DS_Store
 /.claude/

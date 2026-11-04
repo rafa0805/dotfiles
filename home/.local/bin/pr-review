@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# PR のレビューを herdr の新しいタブで始める。
+# タブで PR 専用の worktree を作って Claude Code を起動し、/code-review <PR番号> を実行する。
+#
+#   pr-review 123
+#   pr-review https://github.com/owner/repo/pull/123
+#   pr-review            # 自分宛てのレビュー依頼から fzf で選ぶ
+#
+# - herdr のペインの中で、レビューしたいリポジトリのどこかから実行する
+# - worktree は <リポジトリ>/.claude/worktrees/pr-<番号> にできる
+set -euo pipefail
+
+die() { printf '\033[1;31mpr-review:\033[0m %s\n' "$*" >&2; exit 1; }
+
+for command_name in git gh jq herdr claude; do
+  command -v "$command_name" >/dev/null 2>&1 || die "$command_name が見つかりません"
+done
+[[ -n "${HERDR_ENV:-}" ]] || die "herdr のペインの中で実行してください"
+repo_dir=$(git rev-parse --show-toplevel 2>/dev/null) || die "git リポジトリの中で実行してください"
+cd "$repo_dir"
+
+if [[ $# -ge 1 ]]; then
+  pr_json=$(gh pr view "$1" --json number,url) || die "PR が見つかりません: $1"
+  pr_number=$(jq -r '.number' <<<"$pr_json")
+  pr_url=$(jq -r '.url' <<<"$pr_json")
+  # URL を渡すと別リポジトリの PR も引けてしまうが、worktree を作るのは今いるリポジトリなので弾く
+  repo_url=$(gh repo view --json url -q '.url')
+  [[ "$pr_url" == "$repo_url/pull/"* ]] || die "今いるリポジトリ ($repo_url) の PR ではありません: $pr_url"
+else
+  command -v fzf >/dev/null 2>&1 || die "引数なしで使うには fzf が必要です"
+  pr_number=$(gh pr list --search "review-requested:@me" \
+      --json number,title,author \
+      -q '.[] | "\(.number)\t\(.title)\t@\(.author.login)"' |
+    fzf --delimiter='\t' --prompt="review> " |
+    cut -f1) || true
+  [[ -n "$pr_number" ]] || exit 0
+fi
+[[ "$pr_number" =~ ^[0-9]+$ ]] || die "PR 番号を取得できません: $pr_number"
+
+tab_json=$(herdr tab create --workspace "$HERDR_WORKSPACE_ID" --cwd "$repo_dir" --label "#$pr_number" --focus)
+pane_id=$(jq -r '.result.root_pane.pane_id' <<<"$tab_json")
+[[ -n "$pane_id" && "$pane_id" != "null" ]] || die "作成したタブのペイン ID を取得できません: $tab_json"
+
+herdr pane run "$pane_id" "claude --worktree pr-$pr_number '/code-review $pr_number'" >/dev/null
+
+echo "PR #$pr_number のレビューを新しいタブで始めました"

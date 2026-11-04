@@ -158,6 +158,7 @@ git config --show-origin --get-all credential.https://github.com.helper   # ~/.g
 │   ├── .gitconfig
 │   ├── .tmux.conf
 │   ├── .claude/settings.json   # Claude Code のユーザー設定（このファイルだけリンク）
+│   ├── .local/bin/pr-review    # PR のレビューを herdr の新しいタブで始める
 │   └── .config/
 │       ├── git/hooks/pre-commit-betterleaks  # コミット前のシークレット検出
 │       ├── lazygit/config.yml
@@ -295,6 +296,24 @@ macOS の `/usr/bin/git` や apt の git は古いので、GUI のツールな�
   - git 標準の差分表示
 - 端末の背景色に合わせて `--dark` / `--light` を自動で切り替える（`--{{colorScheme}}`）
 - `--paging=never` で delta から less を起動させない（`~/.gitconfig` の `delta.navigate` は less 前提のため lazygit では効かない）
+
+## スクリプト（`home/.local/bin/`）
+
+`~/.local/bin` にリンクされ、PATH から呼べる。
+
+### pr-review
+
+herdr の新しいタブで PR のレビューを始める。タブで PR 専用の worktree を作って Claude Code を起動し、`/code-review <PR番号>` を実行する。
+
+```sh
+pr-review 123                                     # PR 番号
+pr-review https://github.com/owner/repo/pull/123  # URL（今いるリポジトリの PR のみ）
+pr-review                                         # 自分宛てのレビュー依頼から fzf で選ぶ
+```
+
+- herdr のペインの中で、レビューしたいリポジトリのどこかから実行する（herdr の外ではエラー）
+- タブのラベルは `#123`、worktree は `<リポジトリ>/.claude/worktrees/pr-123` にできる
+- worktree は自動では消えない。レビューが終わったら Claude Code を終了するときに消すか、`git worktree remove .claude/worktrees/pr-123` で消す
 
 ## 更新方法
 
