@@ -1,6 +1,7 @@
 # macOS / Ubuntu 共通で入れる CLI ツール
 
 brew "bat"       # シンタックスハイライト付きcat
+brew "betterleaks" # コミット前にシークレットを検出（gitleaks 後継）
 brew "eza"       # 見やすいls（アイコン・git状態表示）
 brew "fd"        # 速くて使いやすいfind
 brew "fzf"       # あいまい検索（Ctrl-R で履歴検索）

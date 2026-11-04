@@ -25,6 +25,12 @@
 	diffFilter = delta --color-only
 [merge]
 	conflictStyle = zdiff3
+# コミット前に betterleaks でシークレットを検出する（config の hook。git 2.54 以上）。
+# core.hooksPath と違い .git/hooks のフックも今まで通り動く。
+# リポジトリごとに止めるには git config hook.betterleaks.enabled false
+[hook "betterleaks"]
+	event = pre-commit
+	command = ~/.config/git/hooks/pre-commit-betterleaks
 
 # [IMPORTANT] this configuration should be placed in the last in order to overiride base config.
 [include]

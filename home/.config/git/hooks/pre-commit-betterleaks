@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# ステージ済みの変更を betterleaks でスキャンし、シークレットが見つかったらコミットを止める。
+# ~/.gitconfig の [hook "betterleaks"] から pre-commit のときに呼ばれる（git 2.54 以上）。
+# config の hook なので、リポジトリ固有の .git/hooks/pre-commit もこれとは別にそのまま動く。
+#
+# - betterleaks が無い環境では警告だけ出してコミットは通す
+# - 一時的に飛ばす: SKIP_BETTERLEAKS=1 git commit ...
+# - リポジトリごとに止める: git config hook.betterleaks.enabled false
+# - 誤検知: 行末に「betterleaks:allow」コメント、または .betterleaksignore に書く
+set -euo pipefail
+
+warn() { printf '\033[1;33mbetterleaks:\033[0m %s\n' "$*" >&2; }
+
+if [[ -n "${SKIP_BETTERLEAKS:-}" ]]; then
+  warn "SKIP_BETTERLEAKS が設定されているのでシークレットのスキャンを飛ばします"
+  exit 0
+fi
+if ! command -v betterleaks >/dev/null 2>&1; then
+  warn "betterleaks が見つからないのでシークレットのスキャンを飛ばします（brew install betterleaks）"
+  exit 0
+fi
+
+# v2 は git を自分で呼ばないので、git diff を stdin に流す（公式の pre-commit 設定と同じ）。
+# v1（brew の stable はまだ v1）は git --pre-commit --staged を使い、--verbose で
+# 見つかった場所を表示する（v2 は既定で表示し、-v は検証を意味するので付けない）。
+scan_staged() {
+  if betterleaks stdin --help 2>/dev/null | grep -q -- '--git-diff'; then
+    git diff --cached --no-ext-diff --no-textconv --no-color --src-prefix=a/ --dst-prefix=b/ |
+      betterleaks --no-banner stdin --git-diff --redact
+  else
+    betterleaks --no-banner git --pre-commit --staged --redact --verbose --log-level warn </dev/null
+  fi
+}
+
+if ! scan_staged; then
+  warn "シークレットらしき文字列が見つかったのでコミットを中止しました"
+  warn "誤検知なら行末に betterleaks:allow を付けるか、SKIP_BETTERLEAKS=1 git commit ... で飛ばせます"
+  exit 1
+fi
